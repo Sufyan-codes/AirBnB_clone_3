@@ -1,372 +1,447 @@
-<h1 align="center">HolbertonBnB</h1>
-<p align="center">An AirBnB clone.</p>
+# AirBnB_clone_v3: RESTful API
 
-<p align="center">
-  <img src="https://github.com/bdbaraban/AirBnB_clone_v2/blob/master/assets/hbnb_logo.png"
-	    alt="HolbertonBnB logo">
-</p>
+![hbnb](https://camo.githubusercontent.com/a0c52a69dc410e983b8c63fa4aa57e83cb4157cd/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f696e7472616e65742d70726f6a656374732d66696c65732f686f6c626572746f6e7363686f6f6c2d6869676865722d6c6576656c5f70726f6772616d6d696e672b2f3236332f4842544e2d68626e622d46696e616c2e706e67)
 
-## Description :house:
+## Table of Contents
 
-HolbertonBnB is a complete RESTful web application, integrating file and
-database (MySQL) storage in a back-end API with front-end interfacing in a
-clone of AirBnB. The front-end is designed using HTML5/CSS3 and is served using
-Python Flask. The application is configured on a distributed system - two web
-servers and one load balancer - with Nginx and HAProxy.
+* [Description](#description)
+* [Purpose](#purpose)
+* [Requirements](#requirements)
+* [File Descriptions](#file-descriptions)
+* [Environmental Variables](#environmental-variables)
+* [Usage](#usage)
+* [Bugs](#bugs)
+* [Authors](#authors)
+* [License](#license)
 
-HolbertonBnB is still in active development, with complete functionality set to
-deploy in the coming month:
+## Description
 
-* Complete integration of a RESTful API
-* Full configuration of website with domain name
-* Serving of dynamic content using JavaScript
+**hbnb** is a full-stack clone of the web application [AirBnB](https://www.airbnb.com/). This clone was built in four iterative phases. This version includes completion of Phase 1 from [AirBnB_clone_v1: Console and web static](https://github.com/bchen528/AirBnB_clone_v1), Phase 2 from [AirBnB_clone_v2](https://github.com/bchen528/AirBnB_clone_v2) plus Phase 3, which involves exposing stored objects via a JSON web interface and manipulating objects via a custom RESTful API.
 
-<p align="center">
-  <img src="https://github.com/bdbaraban/AirBnB_clone_v2/blob/master/assets/hbnb_stack.png"
-	    alt="HolbertonBnB stack">
-</p>
+### Create a custom RESTful API, expose stored objects via JSON web interface, manipulate objects via custom RESTful API
+![restful_api](https://s3.amazonaws.com/intranet-projects-files/concepts/74/hbnb_step4.png)
 
----
+**Links to other versions:**
+* [AirBnB_clone_v1: Console and web static](https://github.com/bchen528/AirBnB_clone_v1)
+* [AirBnB_clone_v2: MySQL, deploy web static, web framework](https://github.com/bchen528/AirBnB_clone_v2)
+* [AirBnB_clone_v4: Web dynamic](https://github.com/bchen528/AirBnB_clone_v4) (Final version!)
 
-## NOTE TO 2019 LYFT SOFTWARE ENGINEERING APPRENTICESHIP RECRUITER
+## Purpose
+The purpose of Phase 3 is to learn how to:
+* create a RESTful API
+* use CORS
+* request RESTful API
+* retrieve, create, update, delete a resource with HTTP methods
 
-This web app has been the capstone project of my full-stack education at
-Holberton School and I want to show it off as a demonstration of all the
-skills I've learned at this school.
+## Requirements
+* All files compiled with Ubuntu 14.04 LTS
+* Documentation
+* Organized files in proper folders
+* Python unit tests for all files
+* All files must be pep8 compliant
 
-With that said, I must clarify that it is not complete. As mentioned, the
-clone is a work-in-progress, with full deployment as a RESTful API still to
-come. Finishing touches will be occurring over the next month, my final at
-Holberton.
+## File Descriptions
+  **Note:** Below highlights only new file additions for Phase 3. For file descriptions from previous phases, click [Phase 2](https://github.com/bchen528/AirBnB_clone_v2) and [Phase 1](https://github.com/bchen528/AirBnB_clone_v1).
+  * [tests](/tests/) - unit test files
+  * [models](models) - contains all class models for AirBnB objects
+    * [engine](models/engine) - contains storage engines
+      * [`__init__.py`](/models/engine/__init__.py) - empty `__init__.py` file for packages
+      * [file_storage.py](/models/engine/file_storage.py) - class FileStorage; serializes instances to JSON file and deserializes from a JSON file
+        * `all` - returns the dictionary `__objects`
+        * `new` - sets in `__objects` the obj with key `<obj class name>.id`
+        * `save` - serializes `__objects` to the JSON file (path: `__file_path`)
+        * `reload` - deserializes the JSON file to `__objects`
+        * `delete` - delete object from `__objects` if exists
+        * `close` - call reload
+      * [db_storage.py](/models/engine/db_storage.py) - class DBStorage; 
+        * `__init__` - initalize instances
+        * `all` - return dictionary of instance attributes
+        * `new` - add new object to current database session
+        * `save` - commit all changes of the current database session
+        * `delete` - delete from the current database session obj if not None
+        * `reload` - create all tables in database and current database session
+        * `close` - close session
+        * `get` - retrieves an object
+        * `count` - counts number of objects of a class (if given)
+  * [api](api) - contains v1 and v1/views folders
+    * [`__init__.py`](api/__init__.py) - empty `__init__.py` file
+    * [v1](api/v1) - contains app file and views folder
+      * [`__init__.py`](api/v1/__init__.py) - empty `__init__.py` file
+      * [app.py](api/v1/app.py) - app file
+        * `tear` - closes storage engine
+        * `not_found` - handles 404 error and gives json formatted response
+      * [views](api/v1/views) - contains views for AirBnB objects
+        * [`__init__.py`](api/v1/views/__init__.py) - create blueprint
+        * [amenities.py](api/v1/views/amenities.py) - view for Amenity objects that handles all default RestFul API actions
+          * `list_amenities` - retrieves a list of all Amenity objects
+          * `get_amenity` - retrieves an Amenity object
+          * `delete_amenity` - deletes an Amenity object
+          * `create_amenity` - creates an Amenity object
+          * `updates_amenity` - updates an Amenity object
+        * [cities.py](api/v1/views/cities.py) - view for City objects that handles all default RestFul API actions
+          * `list_cities_of_state` - retrieves list of of City objects
+          * `create_city` - creates a City
+          * `get_city` - retrieves a City object
+          * `delete_city` - deletes a City object
+          * `updates_city` - updates a City object
+        * [index.py](api/v1/views/index.py) - index file
+          * `status` - routes to status page
+          * `count` - retrieves number of each objects by type
+        * [places.py](api/v1/views/places.py) - view for Place objects that handles all default RestFul API actions
+          * `list_places_of_city` - retrieves list of of Place objects in city
+          * `create_place` - creates a Place
+          * `get_place` - retrieves a Place object
+          * `delete_place` - deletes a Place object
+          * `updates_place` - updates a Place object
+        * [places_amenities.py](api/v1/views/places_amenities.py) - place-amenity view
+          * `list_amenities_of_place` - retrieves a list of all Amenity objects of a Place
+          * `create_place_amenity` - creates an Amenity
+          * `delete_place_amenity` - deletes an Amenity object
+          * `get_place_amenity` - retrieves an Amenity object
+        * [places_reviews.py](api/v1/views/places_reviews.py) - place-review view
+          * `list_reviews_of_place` - retrieves a list of all Review objects of a Place
+          * `create_review` - creates a review
+          * `get_review` - retrieves a Review object
+          * `delete_review` - deletes a Review object
+          * `updates_review` - updates a Review object
+        * [states.py](api/v1/views/states.py) - view for State objects that handles all default RestFul API actions
+          * `list_states` - retrieves a list of all State objects
+          * `get_state` - retrieves a State object
+          * `delete_state` - deletes a State object
+          * `create_state` - creates a State
+          * `updates_state` - updates a State object
+        * [users.py](api/v1/views/users.py) - 
+          * `list_users` - retrieves list of of User objects
+          * `create_user` - creates a User
+          * `get_user` - retrieves a User object
+          * `delete_user` - deletes a User object
+          * `updates_user` - updates a User object
 
-Recognizing that I am sharing a near-complete project, I additionally put
-together a small Flask app according to the specifications described in the
-application. Please take a look at this separate repository here:
-
-https://github.com/bdbaraban/lyft_apprenticeship_application
-
-Nonetheless, allow me to talk a little more about this AirBnB clone. This
-repository is the second iteration of the project. In the first version
-(viewable [here](https://github.com/bdbaraban/AirBnB_clone)), I, together
-with a cohort mate, built up the initial file storage back-end and
-console from scratch. We pair programmed for most all of this version one work.
-
-In this second iteration of the project, I, together with a new partner,
-inherited a different version of the same back-end written by a pair of
-Holberton students from an older cohort. We then pair programmed
-to build up the database storage engine of the back-end.
-
-In between each version, I put together an entire CSS-styled HTML web page
-for the project. This front-end development was coded independently, although
-the HTML files I personally wrote are only posted in
-[version one](https://github.com/bdbaraban/AirBnB_clone) (the
-[web_static](./web_static) folder in this directory was included in the
-fork). Addtionally, all Shell, Puppet, and Fabric deployment scripts/manifests
-were coded myself.
-
-The README's in both repositories were almost exclusively written myself.
-
-I hope this helps clear things up. I apologize for the confusing versioning, but
-the takeaway is that I've been directly involved in coding at least _an_ implementation
-of everything in this repository. And hey, software development is no fun without
-some confusing version control, right? :sweat_smile: :sob:
-
-Please let me know if you have any questions!
-
----
-
-### Static :page_facing_up:
-
-The front-end of HolbertonBnB was designed from scratch using HTML5/CSS3 pages
-integrated using Flask. While the front-end has not yet been officially deployed,
-screenshots are viewable in the README of the [web_flask](./web_flask) directory.
-
-### Classes :cl:
-
-HolbertonBnB supports the following classes:
-
-* BaseModel
-* User
-* State
-* City
-* Amenity
-* Place
-* Review
-
-## Storage :baggage_claim:
-
-The above classes are handled by one of either two abstracted storage engines,
-depending on the call - [FileStorage](./models/engine/file_storage.py) or
-[DBStorage](./models/engine/db_storage.py).
-
-### FileStorage
-
-The default mode.
-
-In `FileStorage` mode, every time the backend is initialized, HolbertonBnB
-instantiates an instance of `FileStorage` called `storage`. The `storage`
-object is loaded/re-loaded from any class instances stored in the JSON file
-`file.json`. As class instances are created, updated, or deleted, the
-`storage` object is used to register corresponding changes in the `file.json`.
-
-### DBStorage
-
-Run by setting the environmental variables `HBNB_TYPE_STORAGE=db`.
-
-In `DBStorage` mode, every time the backend is initialized, HolbertonBnB
-instantiates an instance of `DBStorage` called `storage`. The `storage` object
-is loaded/re-loaded from the MySQL database specified in the environmental variable
-`HBNB_MYSQL_DB`, using the user `HBNB_MYSQL_USER`, password `HBNB_MYSQL_PWD`, and
-host `HBNB_MYSQL_HOST`. As class instances are created, updated, or deleted, the
-`storage` object is used to register changes in the corresponding MySQL database.
-Connection and querying is achieved using SQLAlchemy.
-
-Note that the databases specified for `DBStorage` to connect to must already be
-defined on the MySQL server. This repository includes scripts
-[setup_mysql_dev.sql](./setup_mysql_dev.sql) and [setup_mysql_test.sql](./setup_mysql_test.sql)
-to set up `hbnb_dev_db` and `hbnb_test_db` databases in a MySQL server,
-respectively.
-
-## Console :computer:
-
-The console is a command line interpreter that permits management of the backend
-of HolbertonBnB. It can be used to handle and manipulate all classes utilized by
-the application (achieved by calls on the `storage` object defined above).
-
-### Using the Console
-
-The HolbertonBnB console can be run both interactively and non-interactively.
-To run the console in non-interactive mode, pipe any command(s) into an execution
-of the file `console.py` at the command line.
-
+## Environmental Variables
 ```
-$ echo "help" | ./console.py
-(hbnb)
-Documented commands (type help <topic>):
-========================================
-EOF  all  count  create  destroy  help  quit  show  update
-
-(hbnb)
-$
+HBNB_ENV: running environment. It can be “dev” or “test” for the moment (“production” soon!)
+HBNB_MYSQL_USER: the username of your MySQL
+HBNB_MYSQL_PWD: the password of your MySQL
+HBNB_MYSQL_HOST: the hostname of your MySQL
+HBNB_MYSQL_DB: the database name of your MySQL
+HBNB_TYPE_STORAGE: the type of storage used. It can be “file” (using FileStorage) or db (using DBStorage)
 ```
 
-Alternatively, to use the HolbertonBnB console in interactive mode, run the
-file `console.py` by itself:
+## Usage
+Run the following in your terminal:
+
+**Test get and count methods for FileStorage and DBStorage**
+```
+user@ubuntu:~/AirBnB_v3$ cat test_get_count.py
+#!/usr/bin/python3
+""" Test .get() and .count() methods
+"""
+from models import storage
+
+print("All objects: {}".format(storage.count()))
+print("State objects: {}".format(storage.count("State")))
+
+first_state_id = list(storage.all("State").values())[0].id
+print("First state: {}".format(storage.get("State", first_state_id)))
+
+user@ubuntu:~/AirBnB_v3$
+user@ubuntu:~/AirBnB_v3$ HBNB_MYSQL_USER=hbnb_dev HBNB_MYSQL_PWD=hbnb_dev_pwd HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_dev_db HBNB_TYPE_STORAGE=db ./test_get_count.py 
+All objects: 1013
+State objects: 27
+First state: [State] (f8d21261-3e79-4f5c-829a-99d7452cd73c) {'name': 'Colorado', 'updated_at': datetime.datetime(2017, 3, 25, 2, 17, 6), 'created_at': datetime.datetime(2017, 3, 25, 2, 17, 6), '_sa_instance_state': <sqlalchemy.orm.state.InstanceState object at 0x7fc0103a8e80>, 'id': 'f8d21261-3e79-4f5c-829a-99d7452cd73c'}
+user@ubuntu:~/AirBnB_v3$
+user@ubuntu:~/AirBnB_v3$ ./test_get_count.py 
+All objects: 19
+State objects: 5
+First state: [State] (af14c85b-172f-4474-8a30-d4ec21f9795e) {'updated_at': datetime.datetime(2017, 4, 13, 17, 10, 22, 378824), 'name': 'Arizona', 'id': 'af14c85b-172f-4474-8a30-d4ec21f9795e', 'created_at': datetime.datetime(2017, 4, 13, 17, 10, 22, 378763)}
+....
 
 ```
-$ ./console.py
+
+**Check status of API**
+Run this in one terminal window:
+```
+user@ubuntu:~/AirBnB_v3$ HBNB_MYSQL_USER=hbnb_dev HBNB_MYSQL_PWD=hbnb_dev_pwd HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_dev_db HBNB_TYPE_STORAGE=db HBNB_API_HOST=0.0.0.0 HBNB_API_PORT=5000 python3 -m api.v1.app
+ * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+...
 ```
 
-Remember, the console can be run with `storage` instantiated in either `FileStorage`
-or `DBStorage` mode. The above examples instantiate `FileStorage` by default, but
-`DBStorage` can be instantiated like so:
-
+And this in another terminal window:
 ```
-$ HBNB_MYSQL_USER=hbnb_dev HBNB_MYSQL_PWD=hbnb_dev_pwd HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_dev_db HBNB_TYPE_STORAGE=db ./console.py
-```
-
-The console functions identically regardless of the `storage` mode.
-
-While running in interactive mode, the console displays a prompt for input:
-
-```
-$ ./console.py
-(hbnb)
+user@ubuntu:~/AirBnB_v3$ curl -X GET http://0.0.0.0:5000/api/v1/status
+{
+  "status": "OK"
+}
+user@ubuntu:~/AirBnB_v3$ curl -X GET -s http://0.0.0.0:5000/api/v1/status -vvv 2>&1 | grep Content-Type
+< Content-Type: application/json
 ```
 
-To quit the console, enter the command `quit`, or input an EOF signal
-(`ctrl-D`).
-
+**Check number of objects by type**
 ```
-$ ./console.py
-(hbnb) quit
-$
-```
-
-```
-$ ./console.py
-(hbnb) EOF
-$
+user@ubuntu:~/AirBnB_v3$ curl -X GET http://0.0.0.0:5000/api/v1/stats
+{
+  "amenities": 47, 
+  "cities": 36, 
+  "places": 154, 
+  "reviews": 718, 
+  "states": 27, 
+  "users": 31
+}
 ```
 
-### Console Commands
-
-The HolbertonBnB console supports the following commands:
-
-#### create
-* Usage: `create <class> <param 1 name>=<param 1 value> <param 2 name>=<param 2 value> ...`
-
-Creates a new instance of a given class. The class' ID is printed and
-the instance is saved to the file `file.json`. When passing parameter key/value
-pairs, any underscores contained in value strings are replaced by spaces.
-
+**Create JSON formatted 404 status code response**
 ```
-$ ./console.py
-(hbnb) create BaseModel
-119be863-6fe5-437e-a180-b9892e8746b8
-(hbnb)
-(hbnb) create State name="California"
-(hbnb) quit
-$ cat file.json ; echo ""
-{"BaseModel.119be863-6fe5-437e-a180-b9892e8746b8": {"updated_at": "2019-02-17T2
-1:30:42.215277", "created_at": "2019-02-17T21:30:42.215277", "__class__": "Base
-Model", "id": "119be863-6fe5-437e-a180-b9892e8746b8"}, {'id': 'd80e0344-63eb-43
-4a-b1e0-07783522124e', 'created_at': datetime.datetime(2017, 11, 10, 4, 41, 7, 
-842160), 'updated_at': datetime.datetime(2017, 11, 10, 4, 41, 7, 842235), 'name
-': 'California'}}
-```
-
-#### show
-* Usage: `show <class> <id>` or `<class>.show(<id>)`
-
-Prints the string representation of a class instance based on a given id.
-
-```
-$ ./console.py
-(hbnb) create User
-1e32232d-5a63-4d92-8092-ac3240b29f46
-(hbnb)
-(hbnb) show User 1e32232d-5a63-4d92-8092-ac3240b29f46
-[User] (1e32232d-5a63-4d92-8092-ac3240b29f46) {'id': '1e32232d-5a63-4d92-8092-a
-c3240b29f46', 'created_at': datetime.datetime(2019, 2, 17, 21, 34, 3, 635828), 
-'updated_at': datetime.datetime(2019, 2, 17, 21, 34, 3, 635828)}
-(hbnb)
-(hbnb) User.show(1e32232d-5a63-4d92-8092-ac3240b29f46)
-[User] (1e32232d-5a63-4d92-8092-ac3240b29f46) {'id': '1e32232d-5a63-4d92-8092-a
-c3240b29f46', 'created_at': datetime.datetime(2019, 2, 17, 21, 34, 3, 635828), 
-'updated_at': datetime.datetime(2019, 2, 17, 21, 34, 3, 635828)}
-(hbnb)
+user@ubuntu:~/AirBnB_v3$ curl -X GET http://0.0.0.0:5000/api/v1/nop
+{
+  "error": "Not found"
+}
+user@ubuntu:~/AirBnB_v3$ curl -X GET http://0.0.0.0:5000/api/v1/nop -vvv
+*   Trying 0.0.0.0...
+* TCP_NODELAY set
+* Connected to 0.0.0.0 (127.0.0.1) port 5000 (#0)
+> GET /api/v1/nop HTTP/1.1
+> Host: 0.0.0.0:5000
+> User-Agent: curl/7.51.0
+> Accept: */*
+> 
+* HTTP 1.0, assume close after body
+< HTTP/1.0 404 NOT FOUND
+< Content-Type: application/json
+< Content-Length: 27
+< Server: Werkzeug/0.12.1 Python/3.4.3
+< Date: Fri, 14 Apr 2017 23:43:24 GMT
+< 
+{
+  "error": "Not found"
+}
 ```
 
-#### destroy
-* Usage: `destroy <class> <id>` or `<class>.destroy(<id>)`
-
-Deletes a class instance based on a given id.
-
+**Run HTTP methods for State**
 ```
-$ ./console.py
-(hbnb) create State
-d2d789cd-7427-4920-aaae-88cbcf8bffe2
-(hbnb) create Place
-3e-8329-4f47-9947-dca80c03d3ed
-(hbnb)
-(hbnb) destroy State d2d789cd-7427-4920-aaae-88cbcf8bffe2
-(hbnb) Place.destroy(03486a3e-8329-4f47-9947-dca80c03d3ed)
-(hbnb) quit
-$ cat file.json ; echo ""
+user@ubuntu:~/AirBnB_v3$ curl -X GET http://0.0.0.0:5000/api/v1/states/
+[
+  {
+    "__class__": "State", 
+    "created_at": "2017-04-14T00:00:02", 
+    "id": "8f165686-c98d-46d9-87d9-d6059ade2d99", 
+    "name": "Louisiana", 
+    "updated_at": "2017-04-14T00:00:02"
+  }, 
+  {
+    "__class__": "State", 
+    "created_at": "2017-04-14T16:21:42", 
+    "id": "1a9c29c7-e39c-4840-b5f9-74310b34f269", 
+    "name": "Arizona", 
+    "updated_at": "2017-04-14T16:21:42"
+  }, 
+...
+user@ubuntu:~/AirBnB_v3$ curl -X GET http://0.0.0.0:5000/api/v1/states/8f165686-c98d-46d9-87d9-d6059ade2d99
+ {
+  "__class__": "State", 
+  "created_at": "2017-04-14T00:00:02", 
+  "id": "8f165686-c98d-46d9-87d9-d6059ade2d99", 
+  "name": "Louisiana", 
+  "updated_at": "2017-04-14T00:00:02"
+} 
+user@ubuntu:~/AirBnB_v3$ curl -X POST http://0.0.0.0:5000/api/v1/states/ -H "Content-Type: application/json" -d '{"name": "California"}' -vvv
+*   Trying 0.0.0.0...
+* TCP_NODELAY set
+* Connected to 0.0.0.0 (127.0.0.1) port 5000 (#0)
+> POST /api/v1/states/ HTTP/1.1
+> Host: 0.0.0.0:5000
+> User-Agent: curl/7.51.0
+> Accept: */*
+> Content-Type: application/json
+> Content-Length: 22
+> 
+* upload completely sent off: 22 out of 22 bytes
+* HTTP 1.0, assume close after body
+< HTTP/1.0 201 CREATED
+< Content-Type: application/json
+< Content-Length: 195
+< Server: Werkzeug/0.12.1 Python/3.4.3
+< Date: Sat, 15 Apr 2017 01:30:27 GMT
+< 
+{
+  "__class__": "State", 
+  "created_at": "2017-04-15T01:30:27.557877", 
+  "id": "feadaa73-9e4b-4514-905b-8253f36b46f6", 
+  "name": "California", 
+  "updated_at": "2017-04-15T01:30:27.558081"
+}
+* Curl_http_done: called premature == 0
+* Closing connection 0
+user@ubuntu:~/AirBnB_v3$ curl -X PUT http://0.0.0.0:5000/api/v1/states/feadaa73-9e4b-4514-905b-8253f36b46f6 -H "Content-Type: application/json" -d '{"name": "California is so cool"}'
+{
+  "__class__": "State", 
+  "created_at": "2017-04-15T01:30:28", 
+  "id": "feadaa73-9e4b-4514-905b-8253f36b46f6", 
+  "name": "California is so cool", 
+  "updated_at": "2017-04-15T01:51:08.044996"
+}
+user@ubuntu:~/AirBnB_v3$ curl -X GET http://0.0.0.0:5000/api/v1/states/feadaa73-9e4b-4514-905b-8253f36b46f6
+{
+  "__class__": "State", 
+  "created_at": "2017-04-15T01:30:28", 
+  "id": "feadaa73-9e4b-4514-905b-8253f36b46f6", 
+  "name": "California is so cool", 
+  "updated_at": "2017-04-15T01:51:08"
+}
+user@ubuntu:~/AirBnB_v3$ curl -X DELETE http://0.0.0.0:5000/api/v1/states/feadaa73-9e4b-4514-905b-8253f36b46f6
 {}
+user@ubuntu:~/AirBnB_v3$ curl -X GET http://0.0.0.0:5000/api/v1/states/feadaa73-9e4b-4514-905b-8253f36b46f6
+{
+  "error": "Not found"
+}
 ```
 
-#### all
-* Usage: `all` or `all <class>` or `<class>.all()`
-
-Prints the string representations of all instances of a given class. If no
-class name is provided, the command prints all instances of every class.
-
+**Run HTTP methods for City**
 ```
-$ ./console.py
-(hbnb) create BaseModel
-fce2124c-8537-489b-956e-22da455cbee8
-(hbnb) create BaseModel
-450490fd-344e-47cf-8342-126244c2ba99
-(hbnb) create User
-b742dbc3-f4bf-425e-b1d4-165f52c6ff81
-(hbnb) create User
-8f2d75c8-fb82-48e1-8ae5-2544c909a9fe
-(hbnb)
-(hbnb) all BaseModel
-["[BaseModel] (450490fd-344e-47cf-8342-126244c2ba99) {'updated_at': datetime.da
-tetime(2019, 2, 17, 21, 45, 5, 963516), 'created_at': datetime.datetime(2019, 2
-, 17, 21, 45, 5, 963516), 'id': '450490fd-344e-47cf-8342-126244c2ba99'}", "[Bas
-eModel] (fce2124c-8537-489b-956e-22da455cbee8) {'updated_at': datetime.datetime
-(2019, 2, 17, 21, 43, 56, 899348), 'created_at': datetime.datetime(2019, 2, 17,
-21, 43, 56, 899348), 'id': 'fce2124c-8537-489b-956e-22da455cbee8'}"]
-(hbnb)
-(hbnb) User.all()
-["[User] (8f2d75c8-fb82-48e1-8ae5-2544c909a9fe) {'updated_at': datetime.datetim
-e(2019, 2, 17, 21, 44, 44, 428413), 'created_at': datetime.datetime(2019, 2, 17
-, 21, 44, 44, 428413), 'id': '8f2d75c8-fb82-48e1-8ae5-2544c909a9fe'}", "[User] 
-(b742dbc3-f4bf-425e-b1d4-165f52c6ff81) {'updated_at': datetime.datetime(2019, 2
-, 17, 21, 44, 15, 974608), 'created_at': datetime.datetime(2019, 2, 17, 21, 44,
-15, 974608), 'id': 'b742dbc3-f4bf-425e-b1d4-165f52c6ff81'}"]
-(hbnb)
-(hbnb) all
-["[User] (8f2d75c8-fb82-48e1-8ae5-2544c909a9fe) {'updated_at': datetime.datetim
-e(2019, 2, 17, 21, 44, 44, 428413), 'created_at': datetime.datetime(2019, 2, 17
-, 21, 44, 44, 428413), 'id': '8f2d75c8-fb82-48e1-8ae5-2544c909a9fe'}", "[BaseMo
-del] (450490fd-344e-47cf-8342-126244c2ba99) {'updated_at': datetime.datetime(20
-19, 2, 17, 21, 45, 5, 963516), 'created_at': datetime.datetime(2019, 2, 17, 21,
-45, 5, 963516), 'id': '450490fd-344e-47cf-8342-126244c2ba99'}", "[User] (b742db
-c3-f4bf-425e-b1d4-165f52c6ff81) {'updated_at': datetime.datetime(2019, 2, 17, 2
-1, 44, 15, 974608), 'created_at': datetime.datetime(2019, 2, 17, 21, 44, 15, 97
-4608), 'id': 'b742dbc3-f4bf-425e-b1d4-165f52c6ff81'}", "[BaseModel] (fce2124c-8
-537-489b-956e-22da455cbee8) {'updated_at': datetime.datetime(2019, 2, 17, 21, 4
-3, 56, 899348), 'created_at': datetime.datetime(2019, 2, 17, 21, 43, 56, 899348
-), 'id': 'fce2124c-8537-489b-956e-22da455cbee8'}"]
-(hbnb)
-```
-
-#### count
-* Usage: `count <class>` or `<class>.count()`
-
-Retrieves the number of instances of a given class.
-
-```
-$ ./console.py
-(hbnb) create Place
-12c73223-f3d3-4dec-9629-bd19c8fadd8a
-(hbnb) create Place
-aa229cbb-5b19-4c32-8562-f90a3437d301
-(hbnb) create City
-22a51611-17bd-4d8f-ba1b-3bf07d327208
-(hbnb)
-(hbnb) count Place
-2
-(hbnb) city.count()
-1
-(hbnb)
-```
-
-#### update
-* Usage: `update <class> <id> <attribute name> "<attribute value>"`
-
-Updates a class instance based on a given id with a given key/value attribute
-pair or dictionary of attribute pairs. If `update` is called with a single
-key/value attribute pair, only "simple" attributes can be updated (ie. not
-`id`, `created_at`, and `updated_at`).
-
-```
-$ ./console.py
-(hbnb) create User
-6f348019-0499-420f-8eec-ef0fdc863c02
-(hbnb)
-(hbnb) update User 6f348019-0499-420f-8eec-ef0fdc863c02 first_name "Holberton" 
-(hbnb) show User 6f348019-0499-420f-8eec-ef0fdc863c02
-[User] (6f348019-0499-420f-8eec-ef0fdc863c02) {'created_at': datetime.datetime(
-2019, 2, 17, 21, 54, 39, 234382), 'first_name': 'Holberton', 'updated_at': date
-time.datetime(2019, 2, 17, 21, 54, 39, 234382), 'id': '6f348019-0499-420f-8eec-
-ef0fdc863c02'}
-(hbnb)
-```
-
-## Testing :straight_ruler:
-
-Unittests for the HolbertonBnB project are defined in the [tests](./tests)
-folder. To run the entire test suite simultaneously, execute the following command:
-
-```
-$ python3 unittest -m discover tests
+user@ubuntu:~/AirBnB_v3$ curl -X GET http://0.0.0.0:5000/api/v1/states/not_an_id/cities/
+{
+  "error": "Not found"
+}
+user@ubuntu:~/AirBnB_v3$ curl -X GET http://0.0.0.0:5000/api/v1/states/2b9a4627-8a9e-4f32-a752-9a84fa7f4efd/cities
+[
+  {
+    "__class__": "City", 
+    "created_at": "2017-03-25T02:17:06", 
+    "id": "1da255c0-f023-4779-8134-2b1b40f87683", 
+    "name": "New Orleans", 
+    "state_id": "2b9a4627-8a9e-4f32-a752-9a84fa7f4efd", 
+    "updated_at": "2017-03-25T02:17:06"
+  }, 
+  {
+    "__class__": "City", 
+    "created_at": "2017-03-25T02:17:06", 
+    "id": "45903748-fa39-4cd0-8a0b-c62bfe471702", 
+    "name": "Lafayette", 
+    "state_id": "2b9a4627-8a9e-4f32-a752-9a84fa7f4efd", 
+    "updated_at": "2017-03-25T02:17:06"
+  }, 
+  {
+    "__class__": "City", 
+    "created_at": "2017-03-25T02:17:06", 
+    "id": "e4e40a6e-59ff-4b4f-ab72-d6d100201588", 
+    "name": "Baton rouge", 
+    "state_id": "2b9a4627-8a9e-4f32-a752-9a84fa7f4efd", 
+    "updated_at": "2017-03-25T02:17:06"
+  }
+]
+user@ubuntu:~/AirBnB_v3$ curl -X GET http://0.0.0.0:5000/api/v1/cities/1da255c0-f023-4779-8134-2b1b40f87683
+{
+  "__class__": "City", 
+  "created_at": "2017-03-25T02:17:06", 
+  "id": "1da255c0-f023-4779-8134-2b1b40f87683", 
+  "name": "New Orleans", 
+  "state_id": "2b9a4627-8a9e-4f32-a752-9a84fa7f4efd", 
+  "updated_at": "2017-03-25T02:17:06"
+}
+user@ubuntu:~/AirBnB_v3$ curl -X POST http://0.0.0.0:5000/api/v1/states/2b9a4627-8a9e-4f32-a752-9a84fa7f4efd/cities -H "Content-Type: application/json" -d '{"name": "Alexandria"}' -vvv
+*   Trying 0.0.0.0...
+* TCP_NODELAY set
+* Connected to 0.0.0.0 (127.0.0.1) port 5000 (#0)
+> POST /api/v1/states/2b9a4627-8a9e-4f32-a752-9a84fa7f4efd/cities/ HTTP/1.1
+> Host: 0.0.0.0:5000
+> User-Agent: curl/7.51.0
+> Accept: */*
+> Content-Type: application/json
+> Content-Length: 22
+> 
+* upload completely sent off: 22 out of 22 bytes
+* HTTP 1.0, assume close after body
+< HTTP/1.0 201 CREATED
+< Content-Type: application/json
+< Content-Length: 249
+< Server: Werkzeug/0.12.1 Python/3.4.3
+< Date: Sun, 16 Apr 2017 03:14:05 GMT
+< 
+{
+  "__class__": "City", 
+  "created_at": "2017-04-16T03:14:05.655490", 
+  "id": "b75ae104-a8a3-475e-bf74-ab0a066ca2af", 
+  "name": "Alexandria", 
+  "state_id": "2b9a4627-8a9e-4f32-a752-9a84fa7f4efd", 
+  "updated_at": "2017-04-16T03:14:05.655748"
+}
+* Curl_http_done: called premature == 0
+* Closing connection 0
+user@ubuntu:~/AirBnB_v3$ curl -X PUT http://0.0.0.0:5000/api/v1/cities/b75ae104-a8a3-475e-bf74-ab0a066ca2af -H "Content-Type: application/json" -d '{"name": "Bossier City"}'
+{
+  "__class__": "City", 
+  "created_at": "2017-04-16T03:14:06", 
+  "id": "b75ae104-a8a3-475e-bf74-ab0a066ca2af", 
+  "name": "Bossier City", 
+  "state_id": "2b9a4627-8a9e-4f32-a752-9a84fa7f4efd", 
+  "updated_at": "2017-04-16T03:15:12.895894"
+}
+user@ubuntu:~/AirBnB_v3$ curl -X GET http://0.0.0.0:5000/api/v1/cities/b75ae104-a8a3-475e-bf74-ab0a066ca2af
+{
+  "__class__": "City", 
+  "created_at": "2017-04-16T03:14:06", 
+  "id": "b75ae104-a8a3-475e-bf74-ab0a066ca2af", 
+  "name": "Bossier City", 
+  "state_id": "2b9a4627-8a9e-4f32-a752-9a84fa7f4efd", 
+  "updated_at": "2017-04-16T03:15:13"
+}
+user@ubuntu:~/AirBnB_v3$ curl -X DELETE http://0.0.0.0:5000/api/v1/cities/b75ae104-a8a3-475e-bf74-ab0a066ca2af
+{}
+user@ubuntu:~/AirBnB_v3$ curl -X GET http://0.0.0.0:5000/api/v1/cities/b75ae104-a8a3-475e-bf74-ab0a066ca2af
+{
+  "error": "Not found"
+}
 ```
 
-Alternatively, you can specify a single test file to run at a time:
-
+**Using CORS**
 ```
-$ python3 unittest -m tests/test_console.py
+user@ubuntu:~/AirBnB_v3$ curl -X GET http://0.0.0.0:5000/api/v1/cities/1da255c0-f023-4779-8134-2b1b40f87683 -vvv
+*   Trying 0.0.0.0...
+* TCP_NODELAY set
+* Connected to 0.0.0.0 (127.0.0.1) port 5000 (#0)
+> GET /api/v1/states/2b9a4627-8a9e-4f32-a752-9a84fa7f4efd/cities/1da255c0-f023-4779-8134-2b1b40f87683 HTTP/1.1
+> Host: 0.0.0.0:5000
+> User-Agent: curl/7.51.0
+> Accept: */*
+> 
+* HTTP 1.0, assume close after body
+< HTTP/1.0 200 OK
+< Content-Type: application/json
+< Access-Control-Allow-Origin: 0.0.0.0
+< Content-Length: 236
+< Server: Werkzeug/0.12.1 Python/3.4.3
+< Date: Sun, 16 Apr 2017 04:20:13 GMT
+< 
+{
+  "__class__": "City", 
+  "created_at": "2017-03-25T02:17:06", 
+  "id": "1da255c0-f023-4779-8134-2b1b40f87683", 
+  "name": "New Orleans", 
+  "state_id": "2b9a4627-8a9e-4f32-a752-9a84fa7f4efd", 
+  "updated_at": "2017-03-25T02:17:06"
+}
+* Curl_http_done: called premature == 0
+* Closing connection 0
 ```
 
-## Authors :black_nib:
-* **Brennan D Baraban** <[bdbaraban](https://github.com/bdbaraban)>
-* **Samie Azad** <[sazad44](https://github.com/sazad44)>
-* **Andrew Lindburg** <[atlindburg](https://github.com/atlindburg)>
-* **Kevin Yook** <[yook00627](https://github.com/yook00627)>
-* **Miranda Evans** <miranda.r.evans@gmail.com>
+## Bugs
+
+At this time, there are no known bugs.
+
+## Authors
+Phase 3:
+* Becky Chen | [GitHub](https://github.com/bchen528) | [Twitter](https://twitter.com/bchen803)
+* Alex Allen | [GitHub](https://github.com/aDENTinTIME) | [Twitter](https://twitter.com/adentintime)
+
+**Note: As per Holberton's requirements, we practice working with new Phase 1 and 2 codebases in our Phase 3 version.**
+
+Phase 2 codebase: 
+* Melissa Ng | [Github](https://github.com/MelissaN)
+* Adriel Tolentino | [Github](https://github.com/adrielt07)
+
+Phase 1 codebase:
+* Binita Rai | [Github](https://github.com/rayraib)
+* Steven Garcia | [Github](https://github.com/stvngrcia)
+
+## License
+
+**hbnb** is open source and free to download and use
